@@ -37,7 +37,7 @@ jobs:
 
       - name: cp subprojects
         run: |
-          cp ./README.md ./index.md
+          mv ./README.md ./index.md
 
       - name: build
         run: pnpm run docs:build
