@@ -1,12 +1,40 @@
 {
+  "name": "@nanoseeds/refactoring2-zh",
   "scripts": {
-    "dev": "vuepress dev docs",
-    "build": "vuepress build docs"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
   },
+  "version": "0.0.1",
+  "description": "vitepress rendered refactoring2-zh",
+  "type": "module",
+  "private": true,
+  "keywords": [
+    "books",
+    "refactor"
+  ],
+  "author": "Yuxi (Evan) You",
+  "contributors": [
+    "gausszhou",
+    "Certseeds"
+  ],
+  "license": "MIT",
   "devDependencies": {
-    "vuepress": "^1.9.8"
+    "vitepress": "^1.6.4"
   },
-  "dependencies": {
-    "@gausszhou/vuepress-theme-gauss": "^1.0.2"
+  "pnpm": {
+    "supportedArchitectures": {
+      "os": [
+        "win32",
+        "linux"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

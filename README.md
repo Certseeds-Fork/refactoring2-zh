@@ -1,6 +1,6 @@
 # refactoring2-zh
 
-《重构 改善既有代码的设计》第二版 中文翻译 [在线阅读](http://gausszhou.github.io/refactoring2-zh/)
+《重构 改善既有代码的设计》第二版 中文翻译 [在线阅读](http://certseeds-fork.github.io/refactoring2-zh/)
 
 [MIT License](./LICENSE)
 
@@ -43,17 +43,17 @@ ThoughtWorks 软件开发工程师，曾服务于国内外多家大型企业，�
 
 ## 本地开发
 
-本项目基于 `vuepress` 进行开发，以提供比 `github` 更佳的阅读体验
+本项目基于 `vitepress` 进行开发，以提供比 `github` 更佳的阅读体验
 
 依赖于 `node.js` 环境
 
 ```bash
 # 本地开发
-git clone https://github.com/gausszhou/refactoring2-zh.git
+git clone https://github.com/certseeds-fork/refactoring2-zh.git
 cd refactoring2-zh/
-yarn 
-yarn dev
+pnpm install
+pnpm docs:dev
 
 # 本地阅读
-http://localhost:8080/refactoring-2zh/
+http://localhost:5173/refactoring-2zh/
 ```
