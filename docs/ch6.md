@@ -123,7 +123,7 @@ function printOwing(invoice) {
 }
 ```
 
-你可能会好奇 Clock.today 是干什么的。这是一个 Clock Wrapper[mf-cw]，也就是封装系统时钟调用的对象。我尽量避免在代码中直接调用 Date.now()这样的函数，因为这会导致测试行为不可预测，以及在诊断故障时难以复制出错时的情况。
+你可能会好奇 Clock.today 是干什么的。这是一个 Clock Wrapper[^mf-cw]，也就是封装系统时钟调用的对象。我尽量避免在代码中直接调用 Date.now()这样的函数，因为这会导致测试行为不可预测，以及在诊断故障时难以复制出错时的情况。
 
 我们可以轻松提炼出“打印横幅”的代码。我只需要剪切、粘贴再插入一个函数调用动作就行了：
 
@@ -1134,7 +1134,7 @@ export function setDefaultOwner(arg) {
 }
 ```
 
-JavaScript 有一种惯例：给取值函数和设值函数起同样的名字，根据有没有传入参数来区分。我把这种做法称为“重载取值/设值函数”（Overloaded Getter Setter）[mf-orgs]，并且我强烈反对这种做法。所以，虽然我不喜欢 get 前缀，但我会保留 set 前缀。
+JavaScript 有一种惯例：给取值函数和设值函数起同样的名字，根据有没有传入参数来区分。我把这种做法称为“重载取值/设值函数”（Overloaded Getter Setter）[^mf-orgs]，并且我强烈反对这种做法。所以，虽然我不喜欢 get 前缀，但我会保留 set 前缀。
 
 ### 封装值
 
@@ -1329,7 +1329,7 @@ function amountOverdue(aDateRange) {...}
 - 如果暂时还没有一个合适的数据结构，就创建一个。
 
 ::: tip
-我倾向于使用类，因为稍后把行为放进来会比较容易。我通常会尽量确保这些新建的数据结构是值对象[mf-vo]。
+我倾向于使用类，因为稍后把行为放进来会比较容易。我通常会尽量确保这些新建的数据结构是值对象[^mf-vo]。
 :::
 
 - 测试。
@@ -1392,7 +1392,7 @@ class NumberRange {
 }
 ```
 
-我声明了一个类，而不是基本的 JavaScript 对象，因为这个重构通常只是一系列重构的起点，随后我会把行为搬移到新建的对象中。既然类更适合承载数据与行为的组合，我就直接从声明一个类开始。同时，在这个新类中，我不会提供任何更新数据的函数，因为我有可能将其处理成值对象（Value Object）[mf-vo]。在使用这个重构手法时，大多数情况下我都会创建值对象。
+我声明了一个类，而不是基本的 JavaScript 对象，因为这个重构通常只是一系列重构的起点，随后我会把行为搬移到新建的对象中。既然类更适合承载数据与行为的组合，我就直接从声明一个类开始。同时，在这个新类中，我不会提供任何更新数据的函数，因为我有可能将其处理成值对象（Value Object）[^mf-vo]。在使用这个重构手法时，大多数情况下我都会创建值对象。
 
 然后我会运用改变函数声明（124），把新的对象作为参数传给 readingsOutsideRange。
 
@@ -1493,7 +1493,7 @@ function readingsOutsideRange(station, range) {
   contains(arg) {return (arg >= this.min && arg <= this.max);}
 ```
 
-这样我就迈出了第一步，开始逐渐打造一个真正有用的“范围”[mf-range]类。一旦识别出“范围”这个概念，那么每当我在代码中发现“最大/最小值”这样一对数字时，我就会考虑是否可以将其改为使用“范围”类。（例如，我马上就会考虑把“运作计划”类中的 temperatureFloor 和 temperatureCeiling 替换为 temperatureRange。）在观察这些成对出现的数字如何被使用时，我会发现一些有用的行为，并将其搬移到“范围”类中，简化其使用方法。比如，我可能会先给这个类加上“基于数值判断相等性”的函数，使其成为一个真正的值对象。
+这样我就迈出了第一步，开始逐渐打造一个真正有用的“范围”[^mf-range]类。一旦识别出“范围”这个概念，那么每当我在代码中发现“最大/最小值”这样一对数字时，我就会考虑是否可以将其改为使用“范围”类。（例如，我马上就会考虑把“运作计划”类中的 temperatureFloor 和 temperatureCeiling 替换为 temperatureRange。）在观察这些成对出现的数字如何被使用时，我会发现一些有用的行为，并将其搬移到“范围”类中，简化其使用方法。比如，我可能会先给这个类加上“基于数值判断相等性”的函数，使其成为一个真正的值对象。
 
 ## 6.9 函数组合成类（Combine Functions into Class）
 
@@ -1525,7 +1525,7 @@ class Reading {
 
 类似这样的一组函数不仅可以组合成一个类，而且可以组合成一个嵌套函数。通常我更倾向于类而非嵌套函数，因为后者测试起来会比较困难。如果我想对外暴露多个函数，也必须采用类的形式。
 
-在有些编程语言中，类不是一等公民，而函数则是。面对这样的语言，可以用“函数作为对象”（Function As Object）[mf-fao]的形式来实现这个重构手法。
+在有些编程语言中，类不是一等公民，而函数则是。面对这样的语言，可以用“函数作为对象”（Function As Object）[^mf-fao]的形式来实现这个重构手法。
 
 ### 做法
 
@@ -1654,7 +1654,7 @@ const aReading = new Reading(rawReading);
 const basicChargeAmount = aReading.baseCharge;
 ```
 
-用这个名字，Reading 类的客户端将不知道 baseCharge 究竟是一个字段还是推演计算出的值。这是好事，它符合“统一访问原则”（Uniform Access Principle）[mf-ua]。
+用这个名字，Reading 类的客户端将不知道 baseCharge 究竟是一个字段还是推演计算出的值。这是好事，它符合“统一访问原则”（Uniform Access Principle）[^mf-ua]。
 
 现在我可以修改客户端 1 的代码，令其调用新的方法，不要重复计算基础费用。
 
@@ -2149,3 +2149,13 @@ function applyShipping(priceData, shippingMethod) {
  return priceData.basePrice - priceData.discount + shippingCost;
 }
 ```
+
+[^mf-cw]: Martin Fowler. "Bliki: ClockWrapper." <https://martinfowler.com/bliki/ClockWrapper.html>
+
+[^mf-fao]: Martin Fowler. "Bliki: FunctionAsObject." <https://martinfowler.com/bliki/ FunctionAsObject.html>
+
+[^mf-range]: Martin Fowler. "Range." <https://martinfowler.com/eaaDev/Range.html>
+
+[^mf-ua]: Martin Fowler. "Bliki: UniformAccessPrinciple." <https://martinfowler.com/bliki/UniformAccessPrinciple.html>
+
+[^mf-vo]: Martin Fowler. "Bliki: ValueObject." <https://martinfowler.com/bliki/ValueObject.html>

@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2025-2025 Certseeds
 // SPDX-License-Identifier: MIT
 import { defineConfig } from 'vitepress'
+import mdFootnote from "markdown-it-footnote"
 
 const hostURL = 'https://certseeds-fork.github.io/'
 
@@ -15,18 +16,18 @@ export default defineConfig({
                 text: '目录',
                 items: [
                     { text: "封面", link: "/" }
-                    , { text: "第 1 章 重构的原则", link: "docs/ch1" }
-                    , { text: "第 2 章 重构的原则", link: "docs/ch2" }
-                    , { text: "第 3 章 代码的坏味道", link: "docs/ch3" }
-                    , { text: "第 4 章 构筑测试体系", link: "docs/ch4" }
-                    , { text: "第 5 章 介绍重构名录", link: "docs/ch5" }
-                    , { text: "第 6 章 第一组重构", link: "docs/ch6" }
-                    , { text: "第 7 章 封装", link: "docs/ch7" }
-                    , { text: "第 8 章 搬移特性", link: "docs/ch8" }
-                    , { text: "第 9 章 重新组织数据", link: "docs/ch9" }
-                    , { text: "第 10 章 简化条件逻辑", link: "docs/ch10" }
-                    , { text: "第 11 章 重构 API", link: "docs/ch11" }
-                    , { text: "第 12 章 处理继承关系", link: "docs/ch12" }
+                    , { text: "第 1 章 重构的原则", link: "/docs/ch1" }
+                    , { text: "第 2 章 重构的原则", link: "/docs/ch2" }
+                    , { text: "第 3 章 代码的坏味道", link: "/docs/ch3" }
+                    , { text: "第 4 章 构筑测试体系", link: "/docs/ch4" }
+                    , { text: "第 5 章 介绍重构名录", link: "/docs/ch5" }
+                    , { text: "第 6 章 第一组重构", link: "/docs/ch6" }
+                    , { text: "第 7 章 封装", link: "/docs/ch7" }
+                    , { text: "第 8 章 搬移特性", link: "/docs/ch8" }
+                    , { text: "第 9 章 重新组织数据", link: "/docs/ch9" }
+                    , { text: "第 10 章 简化条件逻辑", link: "/docs/ch10" }
+                    , { text: "第 11 章 重构 API", link: "/docs/ch11" }
+                    , { text: "第 12 章 处理继承关系", link: "/docs/ch12" }
                     ,
                 ]
             }
@@ -50,7 +51,7 @@ export default defineConfig({
                 fractionalSecondDigits: 3,
                 formatMatcher: "basic",
             },
-        },
+        }
     },
     head: [
         ['meta', { property: 'og:type', content: 'website' }],
@@ -67,6 +68,11 @@ export default defineConfig({
         ['link', { rel: 'license', href: "https://spdx.org/licenses/MIT.html" }],
 
     ],
+    markdown: {
+        config: (md) => {
+            md.use(mdFootnote)
+        },
+    },
     sitemap: {
         hostname: hostURL
     },
