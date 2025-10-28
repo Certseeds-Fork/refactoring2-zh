@@ -2152,7 +2152,7 @@ function applyShipping(priceData, shippingMethod) {
 
 [^mf-cw]: Martin Fowler. "Bliki: ClockWrapper." <https://martinfowler.com/bliki/ClockWrapper.html>
 
-[^mf-fao]: Martin Fowler. "Bliki: FunctionAsObject." <https://martinfowler.com/bliki/ FunctionAsObject.html>
+[^mf-fao]: Martin Fowler. "Bliki: FunctionAsObject." <https://martinfowler.com/bliki/FunctionAsObject.html>
 
 [^mf-range]: Martin Fowler. "Range." <https://martinfowler.com/eaaDev/Range.html>
 
