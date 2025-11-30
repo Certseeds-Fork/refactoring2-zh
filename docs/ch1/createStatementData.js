@@ -1,7 +1,8 @@
-// 创建 PerformanceCalculator 类
 class PerformanceCalculator {
-    constructor(aPerformance) {
+    // 添加 aPlay 参数
+    constructor(aPerformance, aPlay) {
         this.performance = aPerformance;
+        this.play = aPlay;
     }
 }
 
@@ -14,10 +15,11 @@ function createStatementData(invoice, plays) {
     return result;
 
     function enrichPerformance(aPerformance) {
-        // 创建计算器实例（暂时还没使用）
-        const calculator = new PerformanceCalculator(aPerformance);
+        // 将 playFor(aPerformance) 传给计算器
+        const calculator = new PerformanceCalculator(aPerformance, playFor(aPerformance));
         const result = Object.assign({}, aPerformance);
-        result.play = playFor(result);
+        // 使用 calculator.play
+        result.play = calculator.play;
         result.amount = amountFor(result);
         result.volumeCredits = volumeCreditsFor(result);
         return result;
@@ -66,5 +68,4 @@ function createStatementData(invoice, plays) {
         return data.performances.reduce((total, p) => total + p.volumeCredits, 0);
     }
 }
-
 export {createStatementData};

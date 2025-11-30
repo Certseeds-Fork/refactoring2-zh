@@ -1,14 +1,15 @@
 /**
- * 重构步骤 23: 创建 PerformanceCalculator 类
+ * 重构步骤 24: 将 play 字段传给计算器
  * 
- * 开始为引入多态做准备：
- * - 创建 PerformanceCalculator 类
- * - 在 enrichPerformance 中创建计算器实例
- * - 暂时还没有使用计算器做任何事
+ * 应用"改变函数声明(124)"：
+ * - 将 play 作为参数传给 PerformanceCalculator
+ * - 使用 calculator.play 替代 playFor(result)
  */
 
 import { plays, invoices } from "./datas.js";
 import { createStatementData } from "./createStatementData.js";
+
+// ========== statement.js ==========
 
 function statement(invoice, plays) {
     return renderPlainText(createStatementData(invoice, plays));
@@ -49,7 +50,6 @@ function usd(aNumber) {
         minimumFractionDigits: 2
     }).format(aNumber / 100);
 }
-
 
 // 运行测试
 console.log("===== Plain Text Statement =====");
