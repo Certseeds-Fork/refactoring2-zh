@@ -1,8 +1,8 @@
 /**
- * 重构步骤 13: 将 customer 移入中转数据
+ * 重构步骤 14: 将 performances 移入中转数据
  * 
- * 将顾客字段添加到中转对象里
- * renderPlainText 开始使用 data.customer
+ * 将 performances 字段搬移到中转数据
+ * 移除 renderPlainText 的 invoice 参数
  */
 
 import { plays, invoices } from "./datas.js";
@@ -10,15 +10,18 @@ import { plays, invoices } from "./datas.js";
 
 function statement(invoice, plays) {
     const statementData = {};
-    // 将 customer 添加到中转数据
     statementData.customer = invoice.customer;
-    return renderPlainText(statementData, invoice, plays);
+    // 将 performances 添加到中转数据
+    statementData.performances = invoice.performances;
+    // 移除了 invoice 参数
+    return renderPlainText(statementData, plays);
 }
 
-function renderPlainText(data, invoice, plays) {
-    // 使用 data.customer 替代 invoice.customer
+// 移除了 invoice 参数，只使用 data
+function renderPlainText(data, plays) {
     let result = `Statement for ${data.customer}\n`;
-    for (let perf of invoice.performances) {
+    // 使用 data.performances 替代 invoice.performances
+    for (let perf of data.performances) {
         result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
     }
     result += `Amount owed is ${usd(totalAmount())}\n`;
@@ -27,7 +30,8 @@ function renderPlainText(data, invoice, plays) {
 
     function totalAmount() {
         let result = 0;
-        for (let perf of invoice.performances) {
+        // 使用 data.performances
+        for (let perf of data.performances) {
             result += amountFor(perf);
         }
         return result;
@@ -35,7 +39,8 @@ function renderPlainText(data, invoice, plays) {
 
     function totalVolumeCredits() {
         let result = 0;
-        for (let perf of invoice.performances) {
+        // 使用 data.performances
+        for (let perf of data.performances) {
             result += volumeCreditsFor(perf);
         }
         return result;
