@@ -1,10 +1,8 @@
 /**
- * 重构步骤 5: 移除 amountFor 的 play 参数
+ * 重构步骤 6: 提炼观众量积分计算
  * 
- * 应用"改变函数声明(124)"：
- * - 在 amountFor 内部直接调用 playFor
- * - 移除 play 参数
- * - 内联 thisAmount 变量
+ * 应用"提炼函数(106)"：
+ * - 将计算 volumeCredits 的逻辑提炼为 volumeCreditsFor 函数
  */
 
 import { plays, invoices } from "./datas.js";
@@ -20,11 +18,8 @@ function statement(invoice, plays) {
     }).format;
 
     for (let perf of invoice.performances) {
-        // 内联 thisAmount 变量，直接调用 amountFor(perf)
-        // add volume credits
-        volumeCredits += Math.max(perf.audience - 30, 0);
-        // add extra credit for every ten comedy attendees
-        if ("comedy" === playFor(perf).type) volumeCredits += Math.floor(perf.audience / 5);
+        // 调用提炼出的函数
+        volumeCredits += volumeCreditsFor(perf);
 
         // print line for this order
         result += ` ${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${perf.audience} seats)\n`;
@@ -38,7 +33,6 @@ function statement(invoice, plays) {
         return plays[aPerformance.playID];
     }
 
-    // 移除了 play 参数，在函数内部调用 playFor
     function amountFor(aPerformance) {
         let result = 0;
         switch (playFor(aPerformance).type) {
@@ -57,6 +51,16 @@ function statement(invoice, plays) {
                 break;
             default:
                 throw new Error(`unknown type: ${playFor(aPerformance).type}`);
+        }
+        return result;
+    }
+
+    // 提炼出的函数：计算观众量积分
+    function volumeCreditsFor(aPerformance) {
+        let result = 0;
+        result += Math.max(aPerformance.audience - 30, 0);
+        if ("comedy" === playFor(aPerformance).type) {
+            result += Math.floor(aPerformance.audience / 5);
         }
         return result;
     }
