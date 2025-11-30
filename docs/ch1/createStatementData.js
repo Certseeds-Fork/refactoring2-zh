@@ -27,7 +27,6 @@ class PerformanceCalculator {
         return result;
     }
 
-    // 将 volumeCreditsFor 逻辑搬移到这里
     get volumeCredits() {
         let result = 0;
         result += Math.max(this.performance.audience - 30, 0);
@@ -36,6 +35,11 @@ class PerformanceCalculator {
         }
         return result;
     }
+}
+
+// 工厂函数：目前只是简单地返回 PerformanceCalculator 实例
+function createPerformanceCalculator(aPerformance, aPlay) {
+    return new PerformanceCalculator(aPerformance, aPlay);
 }
 
 function createStatementData(invoice, plays) {
@@ -47,11 +51,11 @@ function createStatementData(invoice, plays) {
     return result;
 
     function enrichPerformance(aPerformance) {
-        const calculator = new PerformanceCalculator(aPerformance, playFor(aPerformance));
+        // 使用工厂函数替代直接调用构造函数
+        const calculator = createPerformanceCalculator(aPerformance, playFor(aPerformance));
         const result = Object.assign({}, aPerformance);
         result.play = calculator.play;
         result.amount = calculator.amount;
-        // 使用 calculator.volumeCredits
         result.volumeCredits = calculator.volumeCredits;
         return result;
     }

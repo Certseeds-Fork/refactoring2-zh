@@ -1,9 +1,10 @@
 /**
- * 重构步骤 26: 将 volumeCredits 函数搬移进计算器
+ * 重构步骤 27: 引入工厂函数
  * 
- * 应用"搬移函数(198)"：
- * - 将 volumeCreditsFor 逻辑搬移到 PerformanceCalculator 类中
- * - enrichPerformance 使用 calculator.volumeCredits
+ * 应用"以工厂函数取代构造函数(334)"：
+ * - 创建 createPerformanceCalculator 工厂函数
+ * - JavaScript 的构造函数无法返回子类，需要用普通函数
+ * - 这为后续引入子类做准备
  */
 
 import { plays, invoices } from "./datas.js";
