@@ -1,20 +1,27 @@
 /**
- * 重构步骤 20: 以管道取代循环
+ * 重构步骤 21: 提炼 createStatementData 函数
  * 
- * 应用"以管道取代循环(231)"：
- * - 将 totalAmount 和 totalVolumeCredits 中的 for 循环改为 reduce
+ * 应用"提炼函数(106)"：
+ * - 将第一阶段的代码提炼到 createStatementData 函数
+ * - statement 函数变得非常简洁
  */
 
 import { plays, invoices } from "./datas.js";
 
 
+// statement 现在只是简单地组合两个阶段
 function statement(invoice, plays) {
-    const statementData = {};
-    statementData.customer = invoice.customer;
-    statementData.performances = invoice.performances.map(enrichPerformance);
-    statementData.totalAmount = totalAmount(statementData);
-    statementData.totalVolumeCredits = totalVolumeCredits(statementData);
-    return renderPlainText(statementData, plays);
+    return renderPlainText(createStatementData(invoice, plays));
+}
+
+// 提炼出的 createStatementData 函数：负责计算阶段
+function createStatementData(invoice, plays) {
+    const result = {};
+    result.customer = invoice.customer;
+    result.performances = invoice.performances.map(enrichPerformance);
+    result.totalAmount = totalAmount(result);
+    result.totalVolumeCredits = totalVolumeCredits(result);
+    return result;
 
     function enrichPerformance(aPerformance) {
         const result = Object.assign({}, aPerformance);
@@ -59,7 +66,6 @@ function statement(invoice, plays) {
         return result;
     }
 
-    // 使用 reduce 替代 for 循环
     function totalAmount(data) {
         return data.performances.reduce((total, p) => total + p.amount, 0);
     }
@@ -69,7 +75,8 @@ function statement(invoice, plays) {
     }
 }
 
-function renderPlainText(data, plays) {
+// renderPlainText 现在只需要 data 参数
+function renderPlainText(data) {
     let result = `Statement for ${data.customer}\n`;
     for (let perf of data.performances) {
         result += ` ${perf.play.name}: ${usd(perf.amount)} (${perf.audience} seats)\n`;
@@ -77,14 +84,14 @@ function renderPlainText(data, plays) {
     result += `Amount owed is ${usd(data.totalAmount)}\n`;
     result += `You earned ${data.totalVolumeCredits} credits\n`;
     return result;
+}
 
-    function usd(aNumber) {
-        return new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "USD",
-            minimumFractionDigits: 2
-        }).format(aNumber / 100);
-    }
+function usd(aNumber) {
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2
+    }).format(aNumber / 100);
 }
 
 // 运行测试
