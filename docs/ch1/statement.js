@@ -1,11 +1,12 @@
 /**
- * 重构步骤 2: 提炼函数 - 提炼 amountFor
+ * 重构步骤 3: 重命名变量
  * 
- * 将 switch 语句提炼成独立的 amountFor 函数
- * 这是"提炼函数(106)"重构手法的应用
+ * - thisAmount 重命名为 result（函数返回值命名规范）
+ * - perf 重命名为 aPerformance（类型标注命名规范）
  */
 
 import { plays, invoices } from "./datas.js";
+
 
 function statement(invoice, plays) {
     let totalAmount = 0;
@@ -18,7 +19,7 @@ function statement(invoice, plays) {
 
     for (let perf of invoice.performances) {
         const play = plays[perf.playID];
-        let thisAmount = amountFor(perf, play); // 调用提炼出的函数
+        let thisAmount = amountFor(perf, play);
 
         // add volume credits
         volumeCredits += Math.max(perf.audience - 30, 0);
@@ -33,27 +34,29 @@ function statement(invoice, plays) {
     result += `You earned ${volumeCredits} credits\n`;
     return result;
 
-    // 提炼出的函数：计算一场演出的费用
-    function amountFor(perf, play) {
-        let thisAmount = 0;
+    // 重命名后的函数：
+    // - thisAmount -> result（返回值命名规范）
+    // - perf -> aPerformance（类型标注规范）
+    function amountFor(aPerformance, play) {
+        let result = 0;  // 改名: thisAmount -> result
         switch (play.type) {
             case "tragedy":
-                thisAmount = 40000;
-                if (perf.audience > 30) {
-                    thisAmount += 1000 * (perf.audience - 30);
+                result = 40000;
+                if (aPerformance.audience > 30) {
+                    result += 1000 * (aPerformance.audience - 30);
                 }
                 break;
             case "comedy":
-                thisAmount = 30000;
-                if (perf.audience > 20) {
-                    thisAmount += 10000 + 500 * (perf.audience - 20);
+                result = 30000;
+                if (aPerformance.audience > 20) {
+                    result += 10000 + 500 * (aPerformance.audience - 20);
                 }
-                thisAmount += 300 * perf.audience;
+                result += 300 * aPerformance.audience;
                 break;
             default:
                 throw new Error(`unknown type: ${play.type}`);
         }
-        return thisAmount;
+        return result;
     }
 }
 
