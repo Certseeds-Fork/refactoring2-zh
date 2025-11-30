@@ -1,10 +1,10 @@
 /**
- * 重构步骤 27: 引入工厂函数
+ * 重构步骤 28: 创建子类结构
  * 
- * 应用"以工厂函数取代构造函数(334)"：
- * - 创建 createPerformanceCalculator 工厂函数
- * - JavaScript 的构造函数无法返回子类，需要用普通函数
- * - 这为后续引入子类做准备
+ * 应用"以子类取代类型码(362)"：
+ * - 创建 TragedyCalculator 和 ComedyCalculator 子类
+ * - 工厂函数根据 play.type 返回对应的子类实例
+ * - 此时子类还没有覆盖任何方法
  */
 
 import { plays, invoices } from "./datas.js";

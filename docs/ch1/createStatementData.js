@@ -1,4 +1,5 @@
 
+// 基类
 class PerformanceCalculator {
     constructor(aPerformance, aPlay) {
         this.performance = aPerformance;
@@ -37,9 +38,23 @@ class PerformanceCalculator {
     }
 }
 
-// 工厂函数：目前只是简单地返回 PerformanceCalculator 实例
+// 创建子类（暂时还没有覆盖任何方法）
+class TragedyCalculator extends PerformanceCalculator {
+}
+
+class ComedyCalculator extends PerformanceCalculator {
+}
+
+// 工厂函数：根据类型返回对应的子类实例
 function createPerformanceCalculator(aPerformance, aPlay) {
-    return new PerformanceCalculator(aPerformance, aPlay);
+    switch (aPlay.type) {
+        case "tragedy":
+            return new TragedyCalculator(aPerformance, aPlay);
+        case "comedy":
+            return new ComedyCalculator(aPerformance, aPlay);
+        default:
+            throw new Error(`unknown type: ${aPlay.type}`);
+    }
 }
 
 function createStatementData(invoice, plays) {
@@ -51,7 +66,6 @@ function createStatementData(invoice, plays) {
     return result;
 
     function enrichPerformance(aPerformance) {
-        // 使用工厂函数替代直接调用构造函数
         const calculator = createPerformanceCalculator(aPerformance, playFor(aPerformance));
         const result = Object.assign({}, aPerformance);
         result.play = calculator.play;
