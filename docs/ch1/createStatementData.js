@@ -5,7 +5,6 @@ class PerformanceCalculator {
         this.play = aPlay;
     }
 
-    // 将 amountFor 逻辑搬移到这里
     get amount() {
         let result = 0;
         switch (this.play.type) {
@@ -27,6 +26,16 @@ class PerformanceCalculator {
         }
         return result;
     }
+
+    // 将 volumeCreditsFor 逻辑搬移到这里
+    get volumeCredits() {
+        let result = 0;
+        result += Math.max(this.performance.audience - 30, 0);
+        if ("comedy" === this.play.type) {
+            result += Math.floor(this.performance.audience / 5);
+        }
+        return result;
+    }
 }
 
 function createStatementData(invoice, plays) {
@@ -41,23 +50,14 @@ function createStatementData(invoice, plays) {
         const calculator = new PerformanceCalculator(aPerformance, playFor(aPerformance));
         const result = Object.assign({}, aPerformance);
         result.play = calculator.play;
-        // 使用 calculator.amount
         result.amount = calculator.amount;
-        result.volumeCredits = volumeCreditsFor(result);
+        // 使用 calculator.volumeCredits
+        result.volumeCredits = calculator.volumeCredits;
         return result;
     }
 
     function playFor(aPerformance) {
         return plays[aPerformance.playID];
-    }
-
-    function volumeCreditsFor(aPerformance) {
-        let result = 0;
-        result += Math.max(aPerformance.audience - 30, 0);
-        if ("comedy" === aPerformance.play.type) {
-            result += Math.floor(aPerformance.audience / 5);
-        }
-        return result;
     }
 
     function totalAmount(data) {
