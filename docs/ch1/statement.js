@@ -1,8 +1,10 @@
 /**
- * 重构步骤 7: 移除 format 变量
+ * 重构步骤 8: 移除 volumeCredits 变量
  * 
- * - 将 format 临时变量替换为 usd 函数
- * - 将除以 100 的操作移入函数内部
+ * 应用"拆分循环(227)" + "移动语句(223)" + "提炼函数(106)" + "内联变量(123)"：
+ * - 拆分循环，将 volumeCredits 的累加分离
+ * - 提炼 totalVolumeCredits 函数
+ * - 内联 volumeCredits 变量
  */
 
 import { plays, invoices } from "./datas.js";
@@ -10,19 +12,17 @@ import { plays, invoices } from "./datas.js";
 
 function statement(invoice, plays) {
     let totalAmount = 0;
-    let volumeCredits = 0;
     let result = `Statement for ${invoice.customer}\n`;
-    // 移除了 format 变量
 
     for (let perf of invoice.performances) {
-        volumeCredits += volumeCreditsFor(perf);
-
-        // 使用 usd 函数替代 format
+        // print line for this order
         result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
         totalAmount += amountFor(perf);
     }
+    // volumeCredits 变量被内联，直接调用 totalVolumeCredits()
+
     result += `Amount owed is ${usd(totalAmount)}\n`;
-    result += `You earned ${volumeCredits} credits\n`;
+    result += `You earned ${totalVolumeCredits()} credits\n`;
     return result;
 
     function playFor(aPerformance) {
@@ -60,13 +60,21 @@ function statement(invoice, plays) {
         return result;
     }
 
-    // 新函数：格式化货币，除以 100 的操作移入函数内部
     function usd(aNumber) {
         return new Intl.NumberFormat("en-US", {
             style: "currency",
             currency: "USD",
             minimumFractionDigits: 2
         }).format(aNumber / 100);
+    }
+
+    // 提炼出的函数：计算总观众量积分
+    function totalVolumeCredits() {
+        let result = 0;
+        for (let perf of invoice.performances) {
+            result += volumeCreditsFor(perf);
+        }
+        return result;
     }
 }
 
