@@ -1,23 +1,23 @@
 /**
- * 重构步骤 12: 创建中转数据结构
+ * 重构步骤 13: 将 customer 移入中转数据
  * 
- * 创建 statementData 对象作为两个阶段间传递的中转数据结构
- * 将它作为第一个参数传递给 renderPlainText
- * 
+ * 将顾客字段添加到中转对象里
+ * renderPlainText 开始使用 data.customer
  */
 
 import { plays, invoices } from "./datas.js";
 
 
 function statement(invoice, plays) {
-    // 创建中转数据结构
     const statementData = {};
+    // 将 customer 添加到中转数据
+    statementData.customer = invoice.customer;
     return renderPlainText(statementData, invoice, plays);
 }
 
-// renderPlainText 现在接收 data 参数（暂时还没使用）
 function renderPlainText(data, invoice, plays) {
-    let result = `Statement for ${invoice.customer}\n`;
+    // 使用 data.customer 替代 invoice.customer
+    let result = `Statement for ${data.customer}\n`;
     for (let perf of invoice.performances) {
         result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
     }
