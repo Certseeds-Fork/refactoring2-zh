@@ -1,18 +1,41 @@
+/**
+ * 重构步骤 2: 提炼函数 - 提炼 amountFor
+ * 
+ * 将 switch 语句提炼成独立的 amountFor 函数
+ * 这是"提炼函数(106)"重构手法的应用
+ */
+
 import { plays, invoices } from "./datas.js";
 
 function statement(invoice, plays) {
     let totalAmount = 0;
     let volumeCredits = 0;
     let result = `Statement for ${invoice.customer}\n`;
-    const format = new Intl.NumberFormat("en-US",
-        {
-            style: "currency", currency: "USD",
-            minimumFractionDigits: 2
-        }).format;
+    const format = new Intl.NumberFormat("en-US", {
+        style: "currency", currency: "USD",
+        minimumFractionDigits: 2
+    }).format;
+
     for (let perf of invoice.performances) {
         const play = plays[perf.playID];
-        let thisAmount = 0;
+        let thisAmount = amountFor(perf, play); // 调用提炼出的函数
 
+        // add volume credits
+        volumeCredits += Math.max(perf.audience - 30, 0);
+        // add extra credit for every ten comedy attendees
+        if ("comedy" === play.type) volumeCredits += Math.floor(perf.audience / 5);
+
+        // print line for this order
+        result += ` ${play.name}: ${format(thisAmount / 100)} (${perf.audience} seats)\n`;
+        totalAmount += thisAmount;
+    }
+    result += `Amount owed is ${format(totalAmount / 100)}\n`;
+    result += `You earned ${volumeCredits} credits\n`;
+    return result;
+
+    // 提炼出的函数：计算一场演出的费用
+    function amountFor(perf, play) {
+        let thisAmount = 0;
         switch (play.type) {
             case "tragedy":
                 thisAmount = 40000;
@@ -30,24 +53,11 @@ function statement(invoice, plays) {
             default:
                 throw new Error(`unknown type: ${play.type}`);
         }
-
-        // add volume credits
-        volumeCredits += Math.max(perf.audience - 30, 0);
-        // add extra credit for every ten comedy attendees
-        if ("comedy" === play.type) volumeCredits += Math.floor(perf.audience / 5);
-
-        // print line for this order
-        result += ` ${play.name}: ${format(thisAmount / 100)} (${perf.audience} seats)\n`;
-        totalAmount += thisAmount;
+        return thisAmount;
     }
-    result += `Amount owed is ${format(totalAmount / 100)}\n`;
-    result += `You earned ${volumeCredits} credits\n`;
-    return result;
 }
-// above is code in docs
-// --------
-// below is code that make functions run
+
+// 运行测试
 for (const invoice of invoices) {
-    const result = statement(invoice, plays);
-    console.log(result);
+    console.log(statement(invoice, plays));
 }
