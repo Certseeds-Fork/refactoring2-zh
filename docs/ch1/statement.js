@@ -1,10 +1,9 @@
 /**
- * 重构步骤 28: 创建子类结构
+ * 重构步骤 29: 将悲剧的 amount 下移到子类
  * 
- * 应用"以子类取代类型码(362)"：
- * - 创建 TragedyCalculator 和 ComedyCalculator 子类
- * - 工厂函数根据 play.type 返回对应的子类实例
- * - 此时子类还没有覆盖任何方法
+ * 应用"以多态取代条件表达式(272)"：
+ * - 将悲剧的价格计算逻辑下移到 TragedyCalculator
+ * - 超类中悲剧分支可以抛出异常（作为提醒）
  */
 
 import { plays, invoices } from "./datas.js";

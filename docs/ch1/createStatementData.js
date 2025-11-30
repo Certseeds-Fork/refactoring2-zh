@@ -1,5 +1,4 @@
 
-// 基类
 class PerformanceCalculator {
     constructor(aPerformance, aPlay) {
         this.performance = aPerformance;
@@ -10,11 +9,8 @@ class PerformanceCalculator {
         let result = 0;
         switch (this.play.type) {
             case "tragedy":
-                result = 40000;
-                if (this.performance.audience > 30) {
-                    result += 1000 * (this.performance.audience - 30);
-                }
-                break;
+                // 悲剧分支已下移到子类，这里抛出异常作为提醒
+                throw 'bad thing';
             case "comedy":
                 result = 30000;
                 if (this.performance.audience > 20) {
@@ -38,14 +34,20 @@ class PerformanceCalculator {
     }
 }
 
-// 创建子类（暂时还没有覆盖任何方法）
+// 悲剧计算器：覆盖 amount 方法
 class TragedyCalculator extends PerformanceCalculator {
+    get amount() {
+        let result = 40000;
+        if (this.performance.audience > 30) {
+            result += 1000 * (this.performance.audience - 30);
+        }
+        return result;
+    }
 }
 
 class ComedyCalculator extends PerformanceCalculator {
 }
 
-// 工厂函数：根据类型返回对应的子类实例
 function createPerformanceCalculator(aPerformance, aPlay) {
     switch (aPlay.type) {
         case "tragedy":
