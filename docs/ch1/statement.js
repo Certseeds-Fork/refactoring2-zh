@@ -1,16 +1,23 @@
 /**
- * 重构步骤 10: 大量嵌套函数（1.5 节完成状态）
+ * 重构步骤 11: 提炼 renderPlainText 函数
  * 
- * 此时代码结构已大为改善：
- * - 顶层 statement 函数只有 7 行代码
- * - 所有计算逻辑被提炼为独立的嵌套函数
+ * 应用"提炼函数(106)"：
+ * - 将 statement 函数的全部内容提炼到 renderPlainText 函数
+ * - statement 函数变成一个简单的委托调用
+ * 
+ * 开始 `1.6 拆分计算阶段与格式化阶段`
  */
 
 import { plays, invoices } from "./datas.js";
 
 
 function statement(invoice, plays) {
-    // 主函数现在只有 7 行代码，非常清晰
+    // statement 现在只是一个简单的委托
+    return renderPlainText(invoice, plays);
+}
+
+// 提炼出的 renderPlainText 函数，包含所有嵌套函数
+function renderPlainText(invoice, plays) {
     let result = `Statement for ${invoice.customer}\n`;
     for (let perf of invoice.performances) {
         result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
@@ -18,8 +25,6 @@ function statement(invoice, plays) {
     result += `Amount owed is ${usd(totalAmount())}\n`;
     result += `You earned ${totalVolumeCredits()} credits\n`;
     return result;
-
-    // ===== 以下是所有嵌套函数 =====
 
     function totalAmount() {
         let result = 0;
