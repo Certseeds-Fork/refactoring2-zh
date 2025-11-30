@@ -1,9 +1,8 @@
 /**
- * 重构步骤 19: 将 totalAmount 和 totalVolumeCredits 移入中转数据
+ * 重构步骤 20: 以管道取代循环
  * 
- * - 将 totalAmount 和 totalVolumeCredits 函数搬移到 statement 中
- * - 将计算结果添加到 statementData 中
- * - renderPlainText 使用 data.totalAmount 和 data.totalVolumeCredits
+ * 应用"以管道取代循环(231)"：
+ * - 将 totalAmount 和 totalVolumeCredits 中的 for 循环改为 reduce
  */
 
 import { plays, invoices } from "./datas.js";
@@ -13,7 +12,6 @@ function statement(invoice, plays) {
     const statementData = {};
     statementData.customer = invoice.customer;
     statementData.performances = invoice.performances.map(enrichPerformance);
-    // 将 totalAmount 和 totalVolumeCredits 添加到中转数据
     statementData.totalAmount = totalAmount(statementData);
     statementData.totalVolumeCredits = totalVolumeCredits(statementData);
     return renderPlainText(statementData, plays);
@@ -61,21 +59,13 @@ function statement(invoice, plays) {
         return result;
     }
 
-    // totalAmount 和 totalVolumeCredits 现在在 statement 中，显式接收 data 参数
+    // 使用 reduce 替代 for 循环
     function totalAmount(data) {
-        let result = 0;
-        for (let perf of data.performances) {
-            result += perf.amount;
-        }
-        return result;
+        return data.performances.reduce((total, p) => total + p.amount, 0);
     }
 
     function totalVolumeCredits(data) {
-        let result = 0;
-        for (let perf of data.performances) {
-            result += perf.volumeCredits;
-        }
-        return result;
+        return data.performances.reduce((total, p) => total + p.volumeCredits, 0);
     }
 }
 
@@ -84,7 +74,6 @@ function renderPlainText(data, plays) {
     for (let perf of data.performances) {
         result += ` ${perf.play.name}: ${usd(perf.amount)} (${perf.audience} seats)\n`;
     }
-    // 使用 data.totalAmount 和 data.totalVolumeCredits
     result += `Amount owed is ${usd(data.totalAmount)}\n`;
     result += `You earned ${data.totalVolumeCredits} credits\n`;
     return result;
