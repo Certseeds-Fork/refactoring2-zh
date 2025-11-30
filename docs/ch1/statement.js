@@ -1,8 +1,9 @@
 /**
- * 重构步骤 3: 重命名变量
+ * 重构步骤 4: 移除 play 变量
  * 
- * - thisAmount 重命名为 result（函数返回值命名规范）
- * - perf 重命名为 aPerformance（类型标注命名规范）
+ * 应用"以查询取代临时变量(178)"：
+ * - 提炼 playFor 函数
+ * - 内联 play 变量，改为直接调用 playFor(perf)
  */
 
 import { plays, invoices } from "./datas.js";
@@ -18,27 +19,29 @@ function statement(invoice, plays) {
     }).format;
 
     for (let perf of invoice.performances) {
-        const play = plays[perf.playID];
-        let thisAmount = amountFor(perf, play);
+        // 移除 play 变量，改为直接调用 playFor(perf)
+        let thisAmount = amountFor(perf, playFor(perf));
 
         // add volume credits
         volumeCredits += Math.max(perf.audience - 30, 0);
         // add extra credit for every ten comedy attendees
-        if ("comedy" === play.type) volumeCredits += Math.floor(perf.audience / 5);
+        if ("comedy" === playFor(perf).type) volumeCredits += Math.floor(perf.audience / 5);
 
         // print line for this order
-        result += ` ${play.name}: ${format(thisAmount / 100)} (${perf.audience} seats)\n`;
+        result += ` ${playFor(perf).name}: ${format(thisAmount / 100)} (${perf.audience} seats)\n`;
         totalAmount += thisAmount;
     }
     result += `Amount owed is ${format(totalAmount / 100)}\n`;
     result += `You earned ${volumeCredits} credits\n`;
     return result;
 
-    // 重命名后的函数：
-    // - thisAmount -> result（返回值命名规范）
-    // - perf -> aPerformance（类型标注规范）
+    // 新提炼的函数：查询 play 数据
+    function playFor(aPerformance) {
+        return plays[aPerformance.playID];
+    }
+
     function amountFor(aPerformance, play) {
-        let result = 0;  // 改名: thisAmount -> result
+        let result = 0;
         switch (play.type) {
             case "tragedy":
                 result = 40000;
