@@ -243,7 +243,7 @@ function statement (invoice, plays) {
                           minimumFractionDigits: 2 }).format;
   for (let perf of invoice.performances) {
     const play = plays[perf.playID];
-    let thisAmount = amountFor(perf, play);
+    let thisAmount = amountFor(perf, play); // [!code ++]
 
     // add volume credits
     volumeCredits += Math.max(perf.audience - 30, 0);
@@ -282,25 +282,32 @@ function statement (invoice, plays) {
 
 ```js
 function amountFor(perf, play) {
-  let result = 0;
+  let result = 0; // [!code ++]
+  let thisAmount = 0; // [!code --]
   switch (play.type) {
   case "tragedy":
-    result = 40000;
+    result = 40000; // [!code ++]
+    thisAmount = 40000; // [!code --]
     if (perf.audience > 30) {
-      result += 1000 * (perf.audience - 30);
+      result += 1000 * (perf.audience - 30); // [!code ++]
+      thisAmount += 1000 * (perf.audience - 30); // [!code --]
     }
     break;
   case "comedy":
-    result = 30000;
+    result = 30000; // [!code ++]
+    thisAmount = 30000; // [!code --]
     if (perf.audience > 20) {
-      result += 10000 + 500 * (perf.audience - 20);
+      result += 10000 + 500 * (perf.audience - 20); // [!code ++]
+      thisAmount += 10000 + 500 * (perf.audience - 20); // [!code --]
     }
-    result += 300 * perf.audience;
+    result += 300 * perf.audience; // [!code ++]
+    thisAmount += 300 * perf.audience; // [!code --]
     break;
   default:
       throw new Error(`unknown type: ${play.type}`);
   }
-  return result;
+  return result; // [!code ++]
+  return thisAmount; // [!code --]
 }
 ```
 
@@ -351,9 +358,9 @@ function amountFor(aPerformance, play) {
 #### function statement...
 
 ```js
-function playFor(aPerformance) {
-  return plays[aPerformance.playID];
-}
+function playFor(aPerformance) { // [!code ++]
+  return plays[aPerformance.playID]; // [!code ++]
+} // [!code ++]
 ```
 
 #### 顶层作用域...
@@ -367,7 +374,8 @@ function statement (invoice, plays) {
                         { style: "currency", currency: "USD",
                           minimumFractionDigits: 2 }).format;
   for (let perf of invoice.performances) {
-    const play = playFor(perf);
+    const play = playFor(perf); // [!code ++]
+    const play = plays[perf.playID]; // [!code --]
     let thisAmount = amountFor(perf, play);
 
     // add volume credits
@@ -398,16 +406,19 @@ function statement (invoice, plays) {
                         { style: "currency", currency: "USD",
                           minimumFractionDigits: 2 }).format;
   for (let perf of invoice.performances) {
-    const play = playFor(perf);
-    let thisAmount = amountFor(perf, playFor(perf));
+    const play = playFor(perf); // [!code --]
+    let thisAmount = amountFor(perf, playFor(perf)); // [!code ++]
+    let thisAmount = amountFor(perf, play); // [!code --]
 
     // add volume credits
     volumeCredits += Math.max(perf.audience - 30, 0);
     // add extra credit for every ten comedy attendees
-    if ("comedy" === playFor(perf).type) volumeCredits += Math.floor(perf.audience / 5);
+    if ("comedy" === playFor(perf).type) volumeCredits += Math.floor(perf.audience / 5); // [!code ++]
+    if ("comedy" === play.type) volumeCredits += Math.floor(perf.audience / 5); // [!code --]
 
     // print line for this order
-    result += ` ${playFor(perf).name}: ${format(thisAmount/100)} (${perf.audience} seats)\n`;
+    result += ` ${playFor(perf).name}: ${format(thisAmount/100)} (${perf.audience} seats)\n`; // [!code ++]
+    result += ` ${play.name}: ${format(thisAmount/100)} (${perf.audience} seats)\n`; // [!code --]
     totalAmount += thisAmount;
   }
   result += `Amount owed is ${format(totalAmount/100)}\n`;
@@ -423,7 +434,8 @@ function statement (invoice, plays) {
 ```js
 function amountFor(aPerformance, play) {
   let result = 0;
-  switch (playFor(aPerformance).type) {
+  switch (playFor(aPerformance).type) { // [!code ++]
+  switch (play.type) { // [!code --]
   case "tragedy":
     result = 40000;
     if (aPerformance.audience > 30) {
@@ -438,7 +450,8 @@ function amountFor(aPerformance, play) {
     result += 300 * aPerformance.audience;
     break;
   default:
-      throw new Error(`unknown type: ${playFor(aPerformance).type}`);
+      throw new Error(`unknown type: ${playFor(aPerformance).type}`); // [!code ++]
+      throw new Error(`unknown type: ${play.type}`); // [!code --]
   }
   return result;
 }
@@ -457,7 +470,8 @@ function statement (invoice, plays) {
                         { style: "currency", currency: "USD",
                           minimumFractionDigits: 2 }).format;
   for (let perf of invoice.performances) {
-    let thisAmount = amountFor(perf , playFor(perf) );
+    let thisAmount = amountFor(perf); // [!code ++]
+    let thisAmount = amountFor(perf , playFor(perf) ); // [!code --]
 
     // add volume credits
     volumeCredits += Math.max(perf.audience - 30, 0);
@@ -477,7 +491,8 @@ function statement (invoice, plays) {
 #### function statement...
 
 ```js
-function amountFor(aPerformance , play ) {
+function amountFor(aPerformance) { // [!code ++]
+function amountFor(aPerformance , play ) { // [!code --]
   let result = 0;
   switch (playFor(aPerformance).type) {
   case "tragedy":
@@ -519,6 +534,7 @@ function statement (invoice, plays) {
                         { style: "currency", currency: "USD",
                           minimumFractionDigits: 2 }).format;
     for (let perf of invoice.performances) {
+    let thisAmount = amountFor(perf); // [!code --]
 
     // add volume credits
     volumeCredits += Math.max(perf.audience - 30, 0);
@@ -526,8 +542,10 @@ function statement (invoice, plays) {
     if ("comedy" === playFor(perf).type) volumeCredits += Math.floor(perf.audience / 5);
 
     // print line for this order
-    result += ` ${playFor(perf).name}: ${format(amountFor(perf)/100)} (${perf.audience} seats)\n`;
-    totalAmount += amountFor(perf);
+    result += ` ${playFor(perf).name}: ${format(amountFor(perf)/100)} (${perf.audience} seats)\n`; // [!code ++]
+    result += ` ${playFor(perf).name}: ${format(thisAmount/100)} (${perf.audience} seats)\n`; // [!code --]
+    totalAmount += amountFor(perf); // [!code ++]
+    totalAmount += thisAmount; // [!code --]
   }
   result += `Amount owed is ${format(totalAmount/100)}\n`;
   result += `You earned ${volumeCredits} credits\n`;
@@ -573,13 +591,13 @@ function statement (invoice, plays) {
 #### function statement...
 
 ```js
-function volumeCreditsFor(perf) {
-  let volumeCredits = 0;
-  volumeCredits += Math.max(perf.audience - 30, 0);
-  if ("comedy" === playFor(perf).type)
-    volumeCredits += Math.floor(perf.audience / 5);
-  return volumeCredits;
-}
+function volumeCreditsFor(perf) { // [!code ++]
+  let volumeCredits = 0; // [!code ++]
+  volumeCredits += Math.max(perf.audience - 30, 0); // [!code ++]
+  if ("comedy" === playFor(perf).type) // [!code ++]
+    volumeCredits += Math.floor(perf.audience / 5); // [!code ++]
+  return volumeCredits; // [!code ++]
+} // [!code ++]
 ```
 
 #### 顶层作用域...
@@ -593,7 +611,11 @@ function statement (invoice, plays) {
                         { style: "currency", currency: "USD",
                           minimumFractionDigits: 2 }).format;
   for (let perf of invoice.performances) {
-    volumeCredits += volumeCreditsFor(perf);
+    volumeCredits += volumeCreditsFor(perf); // [!code ++]
+    // add volume credits // [!code --]
+    volumeCredits += Math.max(perf.audience - 30, 0); // [!code --]
+    // add extra credit for every ten comedy attendees // [!code --]
+    if ("comedy" === playFor(perf).type) volumeCredits += Math.floor(perf.audience / 5); // [!code --]
 
     // print line for this order
     result += ` ${playFor(perf).name}: ${format(amountFor(perf)/100)} (${perf.audience} seats)\n`;
@@ -655,13 +677,13 @@ function statement (invoice, plays) {
 #### function statement...
 
 ```js
-function format(aNumber) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(aNumber);
-}
+function format(aNumber) { // [!code ++]
+  return new Intl.NumberFormat("en-US", { // [!code ++]
+    style: "currency", // [!code ++]
+    currency: "USD", // [!code ++]
+    minimumFractionDigits: 2, // [!code ++]
+  }).format(aNumber); // [!code ++]
+} // [!code ++]
 ```
 
 #### 顶层作用域...
@@ -671,6 +693,9 @@ function statement (invoice, plays) {
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `Statement for ${invoice.customer}\n`;
+  const format = new Intl.NumberFormat("en-US", // [!code --]
+                        { style: "currency", currency: "USD", // [!code --]
+                          minimumFractionDigits: 2 }).format; // [!code --]
   for (let perf of invoice.performances) {
     volumeCredits += volumeCreditsFor(perf);
 
@@ -701,10 +726,12 @@ function statement (invoice, plays) {
     volumeCredits += volumeCreditsFor(perf);
 
     // print line for this order
-    result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
+    result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`; // [!code ++]
+    result += ` ${playFor(perf).name}: ${format(amountFor(perf)/100)} (${perf.audience} seats)\n`; // [!code --]
     totalAmount += amountFor(perf);
   }
-  result += `Amount owed is ${usd(totalAmount)}\n`;
+  result += `Amount owed is ${usd(totalAmount)}\n`; // [!code ++]
+  result += `Amount owed is ${format(totalAmount/100)}\n`; // [!code --]
   result += `You earned ${volumeCredits} credits\n`;
   return result;
 }
@@ -713,12 +740,14 @@ function statement (invoice, plays) {
 #### function statement...
 
 ```js
-function usd(aNumber) {
+function usd(aNumber) { // [!code ++]
+function format(aNumber) { // [!code --]
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2,
-  }).format(aNumber / 100);
+  }).format(aNumber / 100); // [!code ++]
+  }).format(aNumber); // [!code --]
 }
 ```
 
@@ -739,14 +768,15 @@ function statement (invoice, plays) {
   let result = `Statement for ${invoice.customer}\n`;
 
   for (let perf of invoice.performances) {
+    volumeCredits += volumeCreditsFor(perf); // [!code --]
 
     // print line for this order
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
     totalAmount += amountFor(perf);
   }
-  for (let perf of invoice.performances) {
-    volumeCredits += volumeCreditsFor(perf);
-  }
+  for (let perf of invoice.performances) { // [!code ++]
+    volumeCredits += volumeCreditsFor(perf); // [!code ++]
+  } // [!code ++]
 
   result += `Amount owed is ${usd(totalAmount)}\n`;
   result += `You earned ${volumeCredits} credits\n`;
@@ -761,6 +791,7 @@ top level…
 ```js
 function statement (invoice, plays) {
   let totalAmount = 0;
+  let volumeCredits = 0; // [!code --]
   let result = `Statement for ${invoice.customer}\n`;
   for (let perf of invoice.performances) {
 
@@ -768,7 +799,7 @@ function statement (invoice, plays) {
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
     totalAmount += amountFor(perf);
   }
-  let volumeCredits = 0;
+  let volumeCredits = 0; // [!code ++]
   for (let perf of invoice.performances) {
     volumeCredits += volumeCreditsFor(perf);
   }
@@ -783,13 +814,13 @@ function statement (invoice, plays) {
 #### function statement...
 
 ```js
-function totalVolumeCredits() {
-  let volumeCredits = 0;
-  for (let perf of invoice.performances) {
-    volumeCredits += volumeCreditsFor(perf);
-  }
-  return volumeCredits;
-}
+function totalVolumeCredits() { // [!code ++]
+  let volumeCredits = 0; // [!code ++]
+  for (let perf of invoice.performances) { // [!code ++]
+    volumeCredits += volumeCreditsFor(perf); // [!code ++]
+  } // [!code ++]
+  return volumeCredits; // [!code ++]
+} // [!code ++]
 ```
 
 #### 顶层作用域...
@@ -804,7 +835,11 @@ function statement (invoice, plays) {
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
     totalAmount += amountFor(perf);
   }
-  let volumeCredits = totalVolumeCredits();
+  let volumeCredits = totalVolumeCredits(); // [!code ++]
+  let volumeCredits = 0; // [!code --]
+  for (let perf of invoice.performances) { // [!code --]
+    volumeCredits += volumeCreditsFor(perf); // [!code --]
+  } // [!code --]
   result += `Amount owed is ${usd(totalAmount)}\n`;
   result += `You earned ${volumeCredits} credits\n`;
   return result;
@@ -827,7 +862,9 @@ function statement (invoice, plays) {
   }
 
   result += `Amount owed is ${usd(totalAmount)}\n`;
-  result += `You earned ${totalVolumeCredits()} credits\n`;
+  result += `You earned ${totalVolumeCredits()} credits\n`; // [!code ++]
+  let volumeCredits = totalVolumeCredits(); // [!code --]
+  result += `You earned ${volumeCredits} credits\n`; // [!code --]
   return result;
 }
 ```
@@ -852,24 +889,26 @@ function statement (invoice, plays) {
 #### function statement...
 
 ```js
-function appleSauce() {
-  let totalAmount = 0;
-  for (let perf of invoice.performances) {
-    totalAmount += amountFor(perf);
-  }
-  return totalAmount;
-}
+function appleSauce() { // [!code ++]
+  let totalAmount = 0; // [!code ++]
+  for (let perf of invoice.performances) { // [!code ++]
+    totalAmount += amountFor(perf); // [!code ++]
+  } // [!code ++]
+  return totalAmount; // [!code ++]
+} // [!code ++]
 ```
 
 #### 顶层作用域...
 
 ```js
 function statement (invoice, plays) {
+  let totalAmount = 0; // [!code --]
   let result = `Statement for ${invoice.customer}\n`;
   for (let perf of invoice.performances) {
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
+    totalAmount += amountFor(perf); // [!code --]
   }
-  let totalAmount = appleSauce();
+  let totalAmount = appleSauce(); // [!code ++]
 
   result += `Amount owed is ${usd(totalAmount)}\n`;
   result += `You earned ${totalVolumeCredits()} credits\n`;
@@ -887,7 +926,9 @@ function statement (invoice, plays) {
   for (let perf of invoice.performances) {
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
   }
-  result += `Amount owed is ${usd(totalAmount())}\n`;
+  result += `Amount owed is ${usd(totalAmount())}\n`; // [!code ++]
+  let totalAmount = appleSauce(); // [!code --]
+  result += `Amount owed is ${usd(totalAmount)}\n`; // [!code --]
   result += `You earned ${totalVolumeCredits()} credits\n`;
   return result;
 }
@@ -896,7 +937,8 @@ function statement (invoice, plays) {
 #### function statement...
 
 ```js
-function totalAmount() {
+function totalAmount() { // [!code ++]
+function appleSauce() { // [!code --]
   let totalAmount = 0;
   for (let perf of invoice.performances) {
     totalAmount += amountFor(perf);
@@ -911,18 +953,24 @@ function totalAmount() {
 
 ```js
 function totalAmount() {
-  let result = 0;
+  let result = 0; // [!code ++]
+  let totalAmount = 0; // [!code --]
   for (let perf of invoice.performances) {
-    result += amountFor(perf);
+    result += amountFor(perf); // [!code ++]
+    totalAmount += amountFor(perf); // [!code --]
   }
-  return result;
+  return result; // [!code ++]
+  return totalAmount; // [!code --]
 }
 function totalVolumeCredits() {
-  let result = 0;
+  let result = 0; // [!code ++]
+  let volumeCredits = 0; // [!code --]
   for (let perf of invoice.performances) {
-    result += volumeCreditsFor(perf);
+    result += volumeCreditsFor(perf); // [!code ++]
+    volumeCredits += volumeCreditsFor(perf); // [!code --]
   }
-  return result;
+  return result; // [!code ++]
+  return volumeCredits; // [!code --]
 }
 ```
 
@@ -1029,11 +1077,13 @@ function totalAmount() {...}
 
 ```js
 function statement (invoice, plays) {
-  const statementData = {};
-  return renderPlainText(statementData, invoice, plays);
+  const statementData = {}; // [!code ++]
+  return renderPlainText(statementData, invoice, plays); // [!code ++]
+  return renderPlainText(invoice, plays); // [!code --]
 }
 
-function renderPlainText(data, invoice, plays) {
+function renderPlainText(data, invoice, plays) { // [!code ++]
+function renderPlainText(invoice, plays) { // [!code --]
   let result = `Statement for ${invoice.customer}\n`;
   for (let perf of invoice.performances) {
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
@@ -1059,12 +1109,13 @@ function renderPlainText(data, invoice, plays) {
 ```js
 function statement (invoice, plays) {
   const statementData = {};
-  statementData.customer = invoice.customer;
+  statementData.customer = invoice.customer; // [!code ++]
   return renderPlainText(statementData, invoice, plays);
 }
 
 function renderPlainText(data, invoice, plays) {
-  let result = `Statement for ${data.customer}\n`;
+  let result = `Statement for ${data.customer}\n`; // [!code ++]
+  let result = `Statement for ${invoice.customer}\n`; // [!code --]
   for (let perf of invoice.performances) {
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
   }
@@ -1082,13 +1133,16 @@ function renderPlainText(data, invoice, plays) {
 function statement (invoice, plays) {
   const statementData = {};
   statementData.customer = invoice.customer;
-  statementData.performances = invoice.performances;
-  return renderPlainText(statementData,  invoice,  plays);
+  statementData.performances = invoice.performances; // [!code ++]
+  return renderPlainText(statementData,  invoice,  plays); // [!code --]
+  return renderPlainText(statementData, plays); // [!code ++]
 }
 
-function renderPlainText(data, plays) {
+function renderPlainText(data, plays) { // [!code ++]
+function renderPlainText(data, invoice, plays) { // [!code --]
   let result = `Statement for ${data.customer}\n`;
-  for (let perf of data.performances) {
+  for (let perf of data.performances) { // [!code ++]
+  for (let perf of invoice.performances) { // [!code --]
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
   }
   result += `Amount owed is ${usd(totalAmount())}\n`;
@@ -1102,14 +1156,16 @@ function renderPlainText(data, plays) {
 ```js
 function totalAmount() {
   let result = 0;
-  for (let perf of data.performances) {
+  for (let perf of data.performances) { // [!code ++]
+  for (let perf of invoice.performances) { // [!code --]
     result += amountFor(perf);
   }
   return result;
 }
 function totalVolumeCredits() {
   let result = 0;
-  for (let perf of data.performances) {
+  for (let perf of data.performances) { // [!code ++]
+  for (let perf of invoice.performances) { // [!code --]
     result += volumeCreditsFor(perf);
   }
   return result;
@@ -1145,13 +1201,13 @@ function statement (invoice, plays) {
 ```js
 function enrichPerformance(aPerformance) {
   const result = Object.assign({}, aPerformance);
-  result.play = playFor(result);
+  result.play = playFor(result); // [!code ++]
   return result;
 }
 
-function playFor(aPerformance) {
-  return plays[aPerformance.playID];
-}
+function playFor(aPerformance) { // [!code ++]
+  return plays[aPerformance.playID]; // [!code ++]
+} // [!code ++]
 ```
 
 然后替换 renderPlainText 中对 playFor 的所有引用点，让它们使用新数据（编译、测试、提交）。
@@ -1161,7 +1217,8 @@ function playFor(aPerformance) {
 ```js
   let result = `Statement for ${data.customer}\n`;
 for (let perf of data.performances) {
-  result += ` ${perf.play.name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
+  result += ` ${perf.play.name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`; // [!code ++]
+  result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`; // [!code --]
 }
 result += `Amount owed is ${usd(totalAmount())}\n`;
 result += `You earned ${totalVolumeCredits()} credits\n`;
@@ -1170,13 +1227,15 @@ return result;
 function volumeCreditsFor(aPerformance) {
   let result = 0;
   result += Math.max(aPerformance.audience - 30, 0);
-  if ("comedy" === aPerformance.play.type) result += Math.floor(aPerformance.audience / 5);
+  if ("comedy" === aPerformance.play.type) result += Math.floor(aPerformance.audience / 5); // [!code ++]
+  if ("comedy" === playFor(aPerformance).type) result += Math.floor(aPerformance.audience / 5); // [!code --]
   return result;
 }
 
 functionamountFor(aPerformance){
   let result = 0;
-  switch (aPerformance.play.type) {
+  switch (aPerformance.play.type) { // [!code ++]
+  switch (playFor(aPerformance).type) { // [!code --]
   case "tragedy":
     result = 40000;
     if (aPerformance.audience > 30) {
@@ -1191,7 +1250,8 @@ functionamountFor(aPerformance){
     result += 300 * aPerformance.audience;
     break;
   default:
-    throw new Error(`unknown type: ${aPerformance.play.type}`);
+    throw new Error(`unknown type: ${aPerformance.play.type}`); // [!code ++]
+    throw new Error(`unknown type: ${playFor(aPerformance).type}`); // [!code --]
   }
   return result;
 }
@@ -1205,11 +1265,11 @@ functionamountFor(aPerformance){
 function enrichPerformance(aPerformance) {
   const result = Object.assign({}, aPerformance);
   result.play = playFor(result);
-  result.amount = amountFor(result);
+  result.amount = amountFor(result); // [!code ++]
   return result;
 }
 
-function amountFor(aPerformance) {...}
+function amountFor(aPerformance) {...} // [!code ++]
 ```
 
 #### function renderPlainText...
@@ -1217,9 +1277,8 @@ function amountFor(aPerformance) {...}
 ```js
 let result = `Statement for ${data.customer}\n`;
 for (let perf of data.performances) {
-  result += ` ${perf.play.name}: ${usd(perf.amount)} (${
-    perf.audience
-  } seats)\n`;
+  result += ` ${perf.play.name}: ${usd(perf.amount)} (${ perf.audience} seats)\n`; // [!code ++]
+  result += ` ${perf.play.name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`; // [!code --]
 }
 result += `Amount owed is ${usd(totalAmount())}\n`;
 result += `You earned ${totalVolumeCredits()} credits\n`;
@@ -1228,7 +1287,8 @@ return result;
 function totalAmount() {
   let result = 0;
   for (let perf of data.performances) {
-    result += perf.amount;
+    result += perf.amount; // [!code ++]
+    result += amountFor(perf); // [!code --]
   }
   return result;
 }
@@ -1243,11 +1303,11 @@ function enrichPerformance(aPerformance) {
   const result = Object.assign({}, aPerformance);
   result.play = playFor(result);
   result.amount = amountFor(result);
-  result.volumeCredits = volumeCreditsFor(result);
+  result.volumeCredits = volumeCreditsFor(result); // [!code ++]
   return result;
 }
 
-function volumeCreditsFor(aPerformance) {...}
+function volumeCreditsFor(aPerformance) {...} // [!code ++]
 ```
 
 #### function renderPlainText...
@@ -1256,7 +1316,8 @@ function volumeCreditsFor(aPerformance) {...}
 function totalVolumeCredits() {
   let result = 0;
   for (let perf of data.performances) {
-    result += perf.volumeCredits;
+    result += perf.volumeCredits; // [!code ++]
+    result += volumeCreditsFor(perf); // [!code --]
   }
   return result;
 }
@@ -1270,12 +1331,12 @@ function totalVolumeCredits() {
   const statementData = {};
 statementData.customer = invoice.customer;
 statementData.performances = invoice.performances.map(enrichPerformance);
-statementData.totalAmount = totalAmount(statementData);
-statementData.totalVolumeCredits = totalVolumeCredits(statementData);
+statementData.totalAmount = totalAmount(statementData); // [!code ++]
+statementData.totalVolumeCredits = totalVolumeCredits(statementData); // [!code ++]
 return renderPlainText(statementData, plays);
 
- function totalAmount(data) {...}
-   function totalVolumeCredits(data) {...}
+ function totalAmount(data) {...} // [!code ++]
+   function totalVolumeCredits(data) {...} // [!code ++]
 ```
 
 #### function renderPlainText...
@@ -1287,8 +1348,10 @@ for (let perf of data.performances) {
     perf.audience
   } seats)\n`;
 }
-result += `Amount owed is ${usd(data.totalAmount)}\n`;
-result += `You earned ${data.totalVolumeCredits} credits\n`;
+result += `Amount owed is ${usd(data.totalAmount)}\n`; // [!code ++]
+result += `Amount owed is ${usd(totalAmount())}\n`; // [!code --]
+result += `You earned ${data.totalVolumeCredits} credits\n`; // [!code ++]
+result += `You earned ${totalVolumeCredits()} credits\n`; // [!code --]
 return result;
 ```
 
@@ -1577,7 +1640,7 @@ enrichPerformance 函数是关键所在，因为正是它用每场演出的数�
 
 ```js
 function enrichPerformance(aPerformance) {
-  const calculator = new PerformanceCalculator(aPerformance);
+  const calculator = new PerformanceCalculator(aPerformance); // [!code ++]
   const result = Object.assign({}, aPerformance);
   result.play = playFor(result);
   result.amount = amountFor(result);
@@ -1589,11 +1652,11 @@ function enrichPerformance(aPerformance) {
 #### 顶层作用域...
 
 ```js
-class PerformanceCalculator {
-  constructor(aPerformance) {
-    this.performance = aPerformance;
-  }
-}
+class PerformanceCalculator { // [!code ++]
+  constructor(aPerformance) { // [!code ++]
+    this.performance = aPerformance; // [!code ++]
+  } // [!code ++]
+} // [!code ++]
 ```
 
 到目前为止，这个新对象还没做什么事。我希望将函数行为搬移进来，这可以从最容易搬移的东西——play 字段开始。严格来讲，我不需要搬移这个字段，因为它并未体现出多态性，但这样可以把所有数据转换集中到一处地方，保证了代码的一致性和清晰度。
@@ -1606,10 +1669,11 @@ class PerformanceCalculator {
 function enrichPerformance(aPerformance) {
   const calculator = new PerformanceCalculator(
     aPerformance,
-    playFor(aPerformance)
+    playFor(aPerformance) // [!code ++]
   );
   const result = Object.assign({}, aPerformance);
-  result.play = calculator.play;
+  result.play = calculator.play; // [!code ++]
+  result.play = playFor(result); // [!code --]
   result.amount = amountFor(result);
   result.volumeCredits = volumeCreditsFor(result);
   return result;
@@ -1620,9 +1684,10 @@ function enrichPerformance(aPerformance) {
 
 ```js
 class PerformanceCalculator {
-  constructor(aPerformance, aPlay) {
+  constructor(aPerformance, aPlay) { // [!code ++]
+  constructor(aPerformance) { // [!code --]
     this.performance = aPerformance;
-    this.play = aPlay;
+    this.play = aPlay; // [!code ++]
   }
 }
 ```
@@ -1636,24 +1701,31 @@ class PerformanceCalculator {
 #### class PerformanceCalculator...
 
 ```js
-  get amount() {
+  get amount() { // [!code ++]
   let result = 0;
-  switch (this.play.type) {
+  switch (this.play.type) { // [!code ++]
+  switch (aPerformance.play.type) { // [!code --]
     case "tragedy":
       result = 40000;
-      if (this.performance.audience > 30) {
-        result += 1000 * (this.performance.audience - 30);
+      if (this.performance.audience > 30) { // [!code ++]
+      if (aPerformance.audience > 30) { // [!code --]
+        result += 1000 * (this.performance.audience - 30); // [!code ++]
+        result += 1000 * (aPerformance.audience - 30); // [!code --]
       }
       break;
     case "comedy":
       result = 30000;
-      if (this.performance.audience > 20) {
-        result += 10000 + 500 * (this.performance.audience - 20);
+      if (this.performance.audience > 20) { // [!code ++]
+      if (aPerformance.audience > 20) { // [!code --]
+        result += 10000 + 500 * (this.performance.audience - 20); // [!code ++]
+        result += 10000 + 500 * (aPerformance.audience - 20); // [!code --]
       }
-      result += 300 * this.performance.audience;
+      result += 300 * this.performance.audience; // [!code ++]
+      result += 300 * aPerformance.audience; // [!code --]
       break;
     default:
-      throw new Error(`unknown type: ${this.play.type}`);
+      throw new Error(`unknown type: ${this.play.type}`); // [!code ++]
+      throw new Error(`unknown type: ${aPerformance.play.type}`); // [!code --]
   }
   return result;
 }
@@ -1667,7 +1739,7 @@ class PerformanceCalculator {
 
 ```js
 function amountFor(aPerformance) {
-  return new PerformanceCalculator(aPerformance, playFor(aPerformance)).amount;
+  return new PerformanceCalculator(aPerformance, playFor(aPerformance)).amount; // [!code ++]
 }
 ```
 
@@ -1683,7 +1755,8 @@ function enrichPerformance(aPerformance) {
   );
   const result = Object.assign({}, aPerformance);
   result.play = calculator.play;
-  result.amount = calculator.amount;
+  result.amount = calculator.amount; // [!code ++]
+  result.amount = amountFor(result); // [!code --]
   result.volumeCredits = volumeCreditsFor(result);
   return result;
 }
@@ -1702,7 +1775,8 @@ function enrichPerformance(aPerformance) {
   const result = Object.assign({}, aPerformance);
   result.play = calculator.play;
   result.amount = calculator.amount;
-  result.volumeCredits = calculator.volumeCredits;
+  result.volumeCredits = calculator.volumeCredits; // [!code ++]
+  result.volumeCredits = volumeCreditsFor(result); // [!code --]
   return result;
 }
 ```
@@ -1710,10 +1784,12 @@ function enrichPerformance(aPerformance) {
 #### class PerformanceCalculator...
 
 ```js
-  get volumeCredits() {
+  get volumeCredits() { // [!code ++]
   let result = 0;
-  result += Math.max(this.performance.audience - 30, 0);
-  if ("comedy" === this.play.type) result += Math.floor(this.performance.audience / 5);
+  result += Math.max(this.performance.audience - 30, 0); // [!code ++]
+  result += Math.max(aPerformance.audience - 30, 0); // [!code --]
+  if ("comedy" === this.play.type) result += Math.floor(this.performance.audience / 5); // [!code ++]
+  if ("comedy" === aPerformance.play.type) result += Math.floor(aPerformance.audience / 5); // [!code --]
   return result;
 }
 ```
@@ -1726,7 +1802,8 @@ function enrichPerformance(aPerformance) {
 
 ```js
 function enrichPerformance(aPerformance) {
-  const calculator = createPerformanceCalculator(
+  const calculator = createPerformanceCalculator( // [!code ++]
+  const calculator = new PerformanceCalculator( // [!code --]
     aPerformance,
     playFor(aPerformance)
   );
@@ -1741,9 +1818,9 @@ function enrichPerformance(aPerformance) {
 #### 顶层作用域...
 
 ```js
-function createPerformanceCalculator(aPerformance, aPlay) {
-  return new PerformanceCalculator(aPerformance, aPlay);
-}
+function createPerformanceCalculator(aPerformance, aPlay) { // [!code ++]
+  return new PerformanceCalculator(aPerformance, aPlay); // [!code ++]
+} // [!code ++]
 ```
 
 改造成普通函数后，我就可以在里面创建演出计算器的子类，然后由创建函数决定返回哪一个子类的实例。
@@ -1752,18 +1829,19 @@ function createPerformanceCalculator(aPerformance, aPlay) {
 
 ```js
 function createPerformanceCalculator(aPerformance, aPlay) {
-  switch (aPlay.type) {
-    case "tragedy":
-      return new TragedyCalculator(aPerformance, aPlay);
-    case "comedy":
-      return new ComedyCalculator(aPerformance, aPlay);
-    default:
-      throw new Error(`unknown type: ${aPlay.type}`);
-  }
+  switch (aPlay.type) { // [!code ++]
+    case "tragedy": // [!code ++]
+      return new TragedyCalculator(aPerformance, aPlay); // [!code ++]
+    case "comedy": // [!code ++]
+      return new ComedyCalculator(aPerformance, aPlay); // [!code ++]
+    default: // [!code ++]
+      throw new Error(`unknown type: ${aPlay.type}`); // [!code ++]
+  } // [!code ++]
+  return new PerformanceCalculator(aPerformance, aPlay); // [!code --]
 }
 
-class TragedyCalculator extends PerformanceCalculator {}
-class ComedyCalculator extends PerformanceCalculator {}
+class TragedyCalculator extends PerformanceCalculator {} // [!code ++]
+class ComedyCalculator extends PerformanceCalculator {} // [!code ++]
 ```
 
 准备好实现多态的类结构后，我就可以继续使用以多态取代条件表达式（272）手法了。
@@ -1773,7 +1851,7 @@ class ComedyCalculator extends PerformanceCalculator {}
 #### class TragedyCalculator...
 
 ```js
-  get amount() {
+  get amount() { // [!code ++]
   let result = 40000;
   if (this.performance.audience > 30) {
     result += 1000 * (this.performance.audience - 30);
@@ -1791,7 +1869,12 @@ class ComedyCalculator extends PerformanceCalculator {}
   let result = 0;
   switch (this.play.type) {
     case "tragedy":
-      throw 'bad thing';
+      throw 'bad thing'; // [!code ++]
+      result = 40000; // [!code --]
+      if (this.performance.audience > 30) { // [!code --]
+        result += 1000 * (this.performance.audience - 30); // [!code --]
+      } // [!code --]
+      break; // [!code --]
     case "comedy":
       result = 30000;
       if (this.performance.audience > 20) {
@@ -1813,7 +1896,7 @@ class ComedyCalculator extends PerformanceCalculator {}
 #### class ComedyCalculator...
 
 ```js
-  get amount() {
+  get amount() { // [!code ++]
   let result = 30000;
   if (this.performance.audience > 20) {
     result += 10000 + 500 * (this.performance.audience - 20);
@@ -1829,7 +1912,22 @@ class ComedyCalculator extends PerformanceCalculator {}
 
 ```js
   get amount() {
-  throw new Error('subclass responsibility');
+  throw new Error('subclass responsibility'); // [!code ++]
+  let result = 0; // [!code --]
+  switch (this.play.type) { // [!code --]
+    case "tragedy": // [!code --]
+      throw 'bad thing'; // [!code --]
+    case "comedy": // [!code --]
+      result = 30000; // [!code --]
+      if (this.performance.audience > 20) { // [!code --]
+        result += 10000 + 500 * (this.performance.audience - 20); // [!code --]
+      } // [!code --]
+      result += 300 * this.performance.audience; // [!code --]
+      break; // [!code --]
+    default: // [!code --]
+      throw new Error(`unknown type: ${this.play.type}`); // [!code --]
+  } // [!code --]
+  return result; // [!code --]
 }
 ```
 
@@ -1839,16 +1937,20 @@ class ComedyCalculator extends PerformanceCalculator {}
 
 ```js
 get volumeCredits() {
-  return Math.max(this.performance.audience - 30, 0);
+  return Math.max(this.performance.audience - 30, 0); // [!code ++]
+  let result = 0; // [!code --]
+  result += Math.max(this.performance.audience - 30, 0); // [!code --]
+  if ("comedy" === this.play.type) result += Math.floor(this.performance.audience / 5); // [!code --]
+  return result; // [!code --]
 }
 ```
 
 #### class ComedyCalculator...
 
 ```js
-get volumeCredits() {
-  return super.volumeCredits + Math.floor(this.performance.audience / 5);
-}
+get volumeCredits() { // [!code ++]
+  return super.volumeCredits + Math.floor(this.performance.audience / 5); // [!code ++]
+} // [!code ++]
 ```
 
 ## 1.9 进展：使用多态计算器来提供数据
