@@ -1,26 +1,58 @@
 /**
- * 重构步骤 9: 移除 totalAmount 变量
+ * 重构步骤 10: 大量嵌套函数（1.5 节完成状态）
  * 
- * 同样应用拆分循环 + 提炼函数 + 内联变量：
- * - 提炼 totalAmount 函数
- * - 内联 totalAmount 变量
- * 
- * Now in head of `1.5 进展：大量嵌套函数`
+ * 此时代码结构已大为改善：
+ * - 顶层 statement 函数只有 7 行代码
+ * - 所有计算逻辑被提炼为独立的嵌套函数
  */
 
 import { plays, invoices } from "./datas.js";
 
 
 function statement(invoice, plays) {
+    // 主函数现在只有 7 行代码，非常清晰
     let result = `Statement for ${invoice.customer}\n`;
-
     for (let perf of invoice.performances) {
         result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
     }
-    // totalAmount 变量被内联，直接调用 totalAmount()
     result += `Amount owed is ${usd(totalAmount())}\n`;
     result += `You earned ${totalVolumeCredits()} credits\n`;
     return result;
+
+    // ===== 以下是所有嵌套函数 =====
+
+    function totalAmount() {
+        let result = 0;
+        for (let perf of invoice.performances) {
+            result += amountFor(perf);
+        }
+        return result;
+    }
+
+    function totalVolumeCredits() {
+        let result = 0;
+        for (let perf of invoice.performances) {
+            result += volumeCreditsFor(perf);
+        }
+        return result;
+    }
+
+    function usd(aNumber) {
+        return new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2
+        }).format(aNumber / 100);
+    }
+
+    function volumeCreditsFor(aPerformance) {
+        let result = 0;
+        result += Math.max(aPerformance.audience - 30, 0);
+        if ("comedy" === playFor(aPerformance).type) {
+            result += Math.floor(aPerformance.audience / 5);
+        }
+        return result;
+    }
 
     function playFor(aPerformance) {
         return plays[aPerformance.playID];
@@ -44,40 +76,6 @@ function statement(invoice, plays) {
                 break;
             default:
                 throw new Error(`unknown type: ${playFor(aPerformance).type}`);
-        }
-        return result;
-    }
-
-    function volumeCreditsFor(aPerformance) {
-        let result = 0;
-        result += Math.max(aPerformance.audience - 30, 0);
-        if ("comedy" === playFor(aPerformance).type) {
-            result += Math.floor(aPerformance.audience / 5);
-        }
-        return result;
-    }
-
-    function usd(aNumber) {
-        return new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "USD",
-            minimumFractionDigits: 2
-        }).format(aNumber / 100);
-    }
-
-    function totalVolumeCredits() {
-        let result = 0;
-        for (let perf of invoice.performances) {
-            result += volumeCreditsFor(perf);
-        }
-        return result;
-    }
-
-    // 提炼出的函数：计算总金额
-    function totalAmount() {
-        let result = 0;
-        for (let perf of invoice.performances) {
-            result += amountFor(perf);
         }
         return result;
     }
