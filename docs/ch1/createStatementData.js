@@ -5,23 +5,9 @@ class PerformanceCalculator {
         this.play = aPlay;
     }
 
+    // 超类的 amount 改为抛出错误，提醒子类必须实现
     get amount() {
-        let result = 0;
-        switch (this.play.type) {
-            case "tragedy":
-                // 悲剧分支已下移到子类，这里抛出异常作为提醒
-                throw 'bad thing';
-            case "comedy":
-                result = 30000;
-                if (this.performance.audience > 20) {
-                    result += 10000 + 500 * (this.performance.audience - 20);
-                }
-                result += 300 * this.performance.audience;
-                break;
-            default:
-                throw new Error(`unknown type: ${this.play.type}`);
-        }
-        return result;
+        throw new Error('subclass responsibility');
     }
 
     get volumeCredits() {
@@ -34,7 +20,6 @@ class PerformanceCalculator {
     }
 }
 
-// 悲剧计算器：覆盖 amount 方法
 class TragedyCalculator extends PerformanceCalculator {
     get amount() {
         let result = 40000;
@@ -45,7 +30,16 @@ class TragedyCalculator extends PerformanceCalculator {
     }
 }
 
+// 喜剧计算器：覆盖 amount 方法
 class ComedyCalculator extends PerformanceCalculator {
+    get amount() {
+        let result = 30000;
+        if (this.performance.audience > 20) {
+            result += 10000 + 500 * (this.performance.audience - 20);
+        }
+        result += 300 * this.performance.audience;
+        return result;
+    }
 }
 
 function createPerformanceCalculator(aPerformance, aPlay) {

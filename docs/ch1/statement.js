@@ -1,9 +1,9 @@
 /**
- * 重构步骤 29: 将悲剧的 amount 下移到子类
+ * 重构步骤 30: 将喜剧的 amount 下移到子类
  * 
- * 应用"以多态取代条件表达式(272)"：
- * - 将悲剧的价格计算逻辑下移到 TragedyCalculator
- * - 超类中悲剧分支可以抛出异常（作为提醒）
+ * 继续应用"以多态取代条件表达式(272)"：
+ * - 将喜剧的价格计算逻辑下移到 ComedyCalculator
+ * - 超类的 amount 方法改为抛出 'subclass responsibility' 错误
  */
 
 import { plays, invoices } from "./datas.js";
