@@ -1,23 +1,22 @@
 /**
- * 重构步骤 11: 提炼 renderPlainText 函数
+ * 重构步骤 12: 创建中转数据结构
  * 
- * 应用"提炼函数(106)"：
- * - 将 statement 函数的全部内容提炼到 renderPlainText 函数
- * - statement 函数变成一个简单的委托调用
+ * 创建 statementData 对象作为两个阶段间传递的中转数据结构
+ * 将它作为第一个参数传递给 renderPlainText
  * 
- * 开始 `1.6 拆分计算阶段与格式化阶段`
  */
 
 import { plays, invoices } from "./datas.js";
 
 
 function statement(invoice, plays) {
-    // statement 现在只是一个简单的委托
-    return renderPlainText(invoice, plays);
+    // 创建中转数据结构
+    const statementData = {};
+    return renderPlainText(statementData, invoice, plays);
 }
 
-// 提炼出的 renderPlainText 函数，包含所有嵌套函数
-function renderPlainText(invoice, plays) {
+// renderPlainText 现在接收 data 参数（暂时还没使用）
+function renderPlainText(data, invoice, plays) {
     let result = `Statement for ${invoice.customer}\n`;
     for (let perf of invoice.performances) {
         result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
