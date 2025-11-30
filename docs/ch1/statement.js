@@ -1,8 +1,9 @@
 /**
- * 重构步骤 14: 将 performances 移入中转数据
+ * 重构步骤 15: 创建 enrichPerformance 函数
  * 
- * 将 performances 字段搬移到中转数据
- * 移除 renderPlainText 的 invoice 参数
+ * 使用 map 和 enrichPerformance 函数来填充 performance 数据
+ * 目前只是返回一个 aPerformance 对象的副本
+ * 返回副本是为了保持数据不可变(immutable)
  */
 
 import { plays, invoices } from "./datas.js";
@@ -11,16 +12,19 @@ import { plays, invoices } from "./datas.js";
 function statement(invoice, plays) {
     const statementData = {};
     statementData.customer = invoice.customer;
-    // 将 performances 添加到中转数据
-    statementData.performances = invoice.performances;
-    // 移除了 invoice 参数
+    // 使用 map 和 enrichPerformance 来处理每个 performance
+    statementData.performances = invoice.performances.map(enrichPerformance);
     return renderPlainText(statementData, plays);
+
+    // 创建 enrichPerformance 函数，返回副本以保持数据不可变
+    function enrichPerformance(aPerformance) {
+        const result = Object.assign({}, aPerformance);
+        return result;
+    }
 }
 
-// 移除了 invoice 参数，只使用 data
 function renderPlainText(data, plays) {
     let result = `Statement for ${data.customer}\n`;
-    // 使用 data.performances 替代 invoice.performances
     for (let perf of data.performances) {
         result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
     }
@@ -30,7 +34,6 @@ function renderPlainText(data, plays) {
 
     function totalAmount() {
         let result = 0;
-        // 使用 data.performances
         for (let perf of data.performances) {
             result += amountFor(perf);
         }
@@ -39,7 +42,6 @@ function renderPlainText(data, plays) {
 
     function totalVolumeCredits() {
         let result = 0;
-        // 使用 data.performances
         for (let perf of data.performances) {
             result += volumeCreditsFor(perf);
         }
