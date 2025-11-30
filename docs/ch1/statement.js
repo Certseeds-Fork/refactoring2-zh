@@ -1,9 +1,9 @@
 /**
- * 重构步骤 17: 将 amount 数据移入 enrichPerformance
+ * 重构步骤 18: 将 volumeCredits 数据移入 enrichPerformance
  * 
- * - 将 amountFor 函数搬移到 statement 函数中
- * - 在 enrichPerformance 中添加 amount 字段
- * - 在 renderPlainText 中使用 perf.amount
+ * - 将 volumeCreditsFor 函数搬移到 statement 函数中
+ * - 在 enrichPerformance 中添加 volumeCredits 字段
+ * - 在 renderPlainText 中使用 perf.volumeCredits
  */
 
 import { plays, invoices } from "./datas.js";
@@ -18,8 +18,9 @@ function statement(invoice, plays) {
     function enrichPerformance(aPerformance) {
         const result = Object.assign({}, aPerformance);
         result.play = playFor(result);
-        // 将 amount 数据添加到 result 中
         result.amount = amountFor(result);
+        // 将 volumeCredits 数据添加到 result 中
+        result.volumeCredits = volumeCreditsFor(result);
         return result;
     }
 
@@ -27,7 +28,6 @@ function statement(invoice, plays) {
         return plays[aPerformance.playID];
     }
 
-    // amountFor 现在在 statement 函数中
     function amountFor(aPerformance) {
         let result = 0;
         switch (aPerformance.play.type) {
@@ -49,12 +49,21 @@ function statement(invoice, plays) {
         }
         return result;
     }
+
+    // volumeCreditsFor 现在在 statement 函数中
+    function volumeCreditsFor(aPerformance) {
+        let result = 0;
+        result += Math.max(aPerformance.audience - 30, 0);
+        if ("comedy" === aPerformance.play.type) {
+            result += Math.floor(aPerformance.audience / 5);
+        }
+        return result;
+    }
 }
 
 function renderPlainText(data, plays) {
     let result = `Statement for ${data.customer}\n`;
     for (let perf of data.performances) {
-        // 使用 perf.amount
         result += ` ${perf.play.name}: ${usd(perf.amount)} (${perf.audience} seats)\n`;
     }
     result += `Amount owed is ${usd(totalAmount())}\n`;
@@ -64,7 +73,6 @@ function renderPlainText(data, plays) {
     function totalAmount() {
         let result = 0;
         for (let perf of data.performances) {
-            // 使用 perf.amount
             result += perf.amount;
         }
         return result;
@@ -73,7 +81,8 @@ function renderPlainText(data, plays) {
     function totalVolumeCredits() {
         let result = 0;
         for (let perf of data.performances) {
-            result += volumeCreditsFor(perf);
+            // 使用 perf.volumeCredits
+            result += perf.volumeCredits;
         }
         return result;
     }
@@ -84,15 +93,6 @@ function renderPlainText(data, plays) {
             currency: "USD",
             minimumFractionDigits: 2
         }).format(aNumber / 100);
-    }
-
-    function volumeCreditsFor(aPerformance) {
-        let result = 0;
-        result += Math.max(aPerformance.audience - 30, 0);
-        if ("comedy" === aPerformance.play.type) {
-            result += Math.floor(aPerformance.audience / 5);
-        }
-        return result;
     }
 }
 
