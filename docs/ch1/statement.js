@@ -1,27 +1,24 @@
 /**
- * 重构步骤 8: 移除 volumeCredits 变量
+ * 重构步骤 9: 移除 totalAmount 变量
  * 
- * 应用"拆分循环(227)" + "移动语句(223)" + "提炼函数(106)" + "内联变量(123)"：
- * - 拆分循环，将 volumeCredits 的累加分离
- * - 提炼 totalVolumeCredits 函数
- * - 内联 volumeCredits 变量
+ * 同样应用拆分循环 + 提炼函数 + 内联变量：
+ * - 提炼 totalAmount 函数
+ * - 内联 totalAmount 变量
+ * 
+ * Now in head of `1.5 进展：大量嵌套函数`
  */
 
 import { plays, invoices } from "./datas.js";
 
 
 function statement(invoice, plays) {
-    let totalAmount = 0;
     let result = `Statement for ${invoice.customer}\n`;
 
     for (let perf of invoice.performances) {
-        // print line for this order
         result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
-        totalAmount += amountFor(perf);
     }
-    // volumeCredits 变量被内联，直接调用 totalVolumeCredits()
-
-    result += `Amount owed is ${usd(totalAmount)}\n`;
+    // totalAmount 变量被内联，直接调用 totalAmount()
+    result += `Amount owed is ${usd(totalAmount())}\n`;
     result += `You earned ${totalVolumeCredits()} credits\n`;
     return result;
 
@@ -68,11 +65,19 @@ function statement(invoice, plays) {
         }).format(aNumber / 100);
     }
 
-    // 提炼出的函数：计算总观众量积分
     function totalVolumeCredits() {
         let result = 0;
         for (let perf of invoice.performances) {
             result += volumeCreditsFor(perf);
+        }
+        return result;
+    }
+
+    // 提炼出的函数：计算总金额
+    function totalAmount() {
+        let result = 0;
+        for (let perf of invoice.performances) {
+            result += amountFor(perf);
         }
         return result;
     }
