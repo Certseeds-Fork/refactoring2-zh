@@ -1,9 +1,10 @@
 /**
- * 重构步骤 4: 移除 play 变量
+ * 重构步骤 5: 移除 amountFor 的 play 参数
  * 
- * 应用"以查询取代临时变量(178)"：
- * - 提炼 playFor 函数
- * - 内联 play 变量，改为直接调用 playFor(perf)
+ * 应用"改变函数声明(124)"：
+ * - 在 amountFor 内部直接调用 playFor
+ * - 移除 play 参数
+ * - 内联 thisAmount 变量
  */
 
 import { plays, invoices } from "./datas.js";
@@ -19,30 +20,28 @@ function statement(invoice, plays) {
     }).format;
 
     for (let perf of invoice.performances) {
-        // 移除 play 变量，改为直接调用 playFor(perf)
-        let thisAmount = amountFor(perf, playFor(perf));
-
+        // 内联 thisAmount 变量，直接调用 amountFor(perf)
         // add volume credits
         volumeCredits += Math.max(perf.audience - 30, 0);
         // add extra credit for every ten comedy attendees
         if ("comedy" === playFor(perf).type) volumeCredits += Math.floor(perf.audience / 5);
 
         // print line for this order
-        result += ` ${playFor(perf).name}: ${format(thisAmount / 100)} (${perf.audience} seats)\n`;
-        totalAmount += thisAmount;
+        result += ` ${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${perf.audience} seats)\n`;
+        totalAmount += amountFor(perf);
     }
     result += `Amount owed is ${format(totalAmount / 100)}\n`;
     result += `You earned ${volumeCredits} credits\n`;
     return result;
 
-    // 新提炼的函数：查询 play 数据
     function playFor(aPerformance) {
         return plays[aPerformance.playID];
     }
 
-    function amountFor(aPerformance, play) {
+    // 移除了 play 参数，在函数内部调用 playFor
+    function amountFor(aPerformance) {
         let result = 0;
-        switch (play.type) {
+        switch (playFor(aPerformance).type) {
             case "tragedy":
                 result = 40000;
                 if (aPerformance.audience > 30) {
@@ -57,7 +56,7 @@ function statement(invoice, plays) {
                 result += 300 * aPerformance.audience;
                 break;
             default:
-                throw new Error(`unknown type: ${play.type}`);
+                throw new Error(`unknown type: ${playFor(aPerformance).type}`);
         }
         return result;
     }
