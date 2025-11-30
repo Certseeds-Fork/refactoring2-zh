@@ -1,9 +1,10 @@
 /**
- * 重构步骤 30: 将喜剧的 amount 下移到子类
+ * 重构步骤 31: 处理 volumeCredits 的多态（1.9 节完成状态）
  * 
- * 继续应用"以多态取代条件表达式(272)"：
- * - 将喜剧的价格计算逻辑下移到 ComedyCalculator
- * - 超类的 amount 方法改为抛出 'subclass responsibility' 错误
+ * 完成"以多态取代条件表达式(272)"：
+ * - 超类 volumeCredits 保留通用逻辑（检查观众数是否达到 30）
+ * - 喜剧子类覆盖 volumeCredits，添加额外积分
+ * - 这是最终版本
  */
 
 import { plays, invoices } from "./datas.js";
