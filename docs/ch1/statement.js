@@ -1,15 +1,14 @@
 /**
- * 重构步骤 24: 将 play 字段传给计算器
+ * 重构步骤 25: 将 amount 函数搬移进计算器
  * 
- * 应用"改变函数声明(124)"：
- * - 将 play 作为参数传给 PerformanceCalculator
- * - 使用 calculator.play 替代 playFor(result)
+ * 应用"搬移函数(198)"：
+ * - 将 amountFor 逻辑复制到 PerformanceCalculator 类中
+ * - 使用 this.performance 和 this.play
+ * - enrichPerformance 使用 calculator.amount
  */
 
 import { plays, invoices } from "./datas.js";
 import { createStatementData } from "./createStatementData.js";
-
-// ========== statement.js ==========
 
 function statement(invoice, plays) {
     return renderPlainText(createStatementData(invoice, plays));
